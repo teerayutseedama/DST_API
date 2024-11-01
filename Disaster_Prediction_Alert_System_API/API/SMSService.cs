@@ -9,16 +9,19 @@ namespace Disaster_Prediction_Alert_System_API.API
     public class SMSService
     {
         string PhoneNumber = "";
-        public SMSService(string sendToPhoneNumber)
+       private  string _accountSid = "";
+       private string _authToken = "";
+        public SMSService(string sendToPhoneNumber,string accountId,string token)
         {
             PhoneNumber = sendToPhoneNumber;
+            _accountSid = accountId;
+            _authToken = token;
         }
         public bool SendMessage(string TextMessage)
         {
            
-            var accountSid = "AC3e20387a680f58140e3b962be546b98c";
-            var authToken = "bd6728ab7331d73d889da40531ff6a3c";
-            TwilioClient.Init(accountSid, authToken);
+           
+            TwilioClient.Init(_accountSid, _authToken);
             var messageOptions = new CreateMessageOptions(
               new PhoneNumber(PhoneNumber));
             messageOptions.From = new PhoneNumber("+14437323122");

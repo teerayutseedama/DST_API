@@ -18,12 +18,14 @@ namespace Disaster_Prediction_Alert_System_API.Controllers
         private readonly DisasterDbContext _dbContext;
         private readonly EarthquakeService _earthquakeService;
         private readonly OpenWeatherAPI _openWeather;
-        public DisasterController(DisasterDbContext dbContext, EarthquakeService earthquakeService, OpenWeatherAPI openWeather)
+        protected readonly IConfiguration _configuration;
+        public DisasterController(IConfiguration configuration, DisasterDbContext dbContext, EarthquakeService earthquakeService, OpenWeatherAPI openWeather)
         {
             _httpResponse = new IHttpResponse();
             _earthquakeService = earthquakeService;
             _dbContext = dbContext;
             _openWeather = openWeather;
+            _configuration = configuration;
         }
 
         [HttpGet("disaster-risks")]
@@ -253,12 +255,19 @@ namespace Disaster_Prediction_Alert_System_API.Controllers
         {
             try
             {
-                SMSService sMSService = new SMSService("+66982258524");
-                var alert = await _dbContext.TbAlerts.ToListAsync();
-                foreach (var item in alert)
+                string account = _configuration.GetValue<string>("SMS:accountSid")??"";
+                string token = _configuration.GetValue<string>("SMS:accountSid")??"";
+                string sendTo = _configuration.GetValue<string>("SMS:sendTo")??"";
+                if (!string.IsNullOrEmpty(account) && !string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(sendTo))
                 {
-                    sMSService.SendMessage(item.AlertMessage);
+                    SMSService sMSService = new SMSService(sendTo, account, token);
+                    var alert = await _dbContext.TbAlerts.ToListAsync();
+                    foreach (var item in alert)
+                    {
+                        sMSService.SendMessage(item.AlertMessage);
+                    }
                 }
+               
             }
             catch (Exception ex)
             {
