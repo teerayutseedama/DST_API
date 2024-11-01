@@ -1,0 +1,6 @@
+@Disaster_Prediction_Alert_System_API_HostAddress = http://localhost:5083
+
+GET {{Disaster_Prediction_Alert_System_API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
